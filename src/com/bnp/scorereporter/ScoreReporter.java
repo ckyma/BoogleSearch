@@ -115,7 +115,7 @@ public class ScoreReporter extends TimerTask {
                 LogFile.log(ex, "warning", "Failed to delay for 500ms.");
             }
 
-            System.out.print("Type Y and Enter to report immediately:");
+            System.out.println("Type Y and Enter to report immediately:");
             Scanner sc = new Scanner(System.in);
             String input = sc.next();
             if(input.equals("Y")){
@@ -170,6 +170,7 @@ public class ScoreReporter extends TimerTask {
 
         // Stop if the time interval is not more than 1 millisecond
         if(milliSec < 1){
+            LogFile.log(null, "severe", "error scheduled time frequency.");
             return null;
         }
 
@@ -179,6 +180,7 @@ public class ScoreReporter extends TimerTask {
         // Parse the first starting time
         SimpleDateFormat timeParser = new SimpleDateFormat("HH:mm");
         Date time = new Date();
+
         try {
             time = timeParser.parse(timeStr);
         }
@@ -192,6 +194,12 @@ public class ScoreReporter extends TimerTask {
         calendar.set(Calendar.MINUTE, time.getMinutes());
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
+
+        // Increment the starting time by one day if the time has passed on the current running day, i.e., scheduled to start from the next day
+        Date now = new Date();
+        if(calendar.getTime().before(now)){
+            calendar.add(Calendar.DATE, 1);
+        }
 
         // Instantiate Timer Object
         Timer timer = new Timer();
